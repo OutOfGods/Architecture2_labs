@@ -110,7 +110,14 @@ func (tree *Tree) TraversePost(fn func(*Node), r2l bool) {
 	}
 }
 
-// breadth first <-- TODO
+// breadth first
+
+func (node *Node) TraverseBF(fn func(*Node), r2l bool) {
+	var queue []*Node
+	queue = append(queue, node)
+
+	// TODO
+}
 
 // dump to dot <-- TODO maybe
 
