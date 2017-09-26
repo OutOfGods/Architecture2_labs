@@ -14,6 +14,8 @@ type Node struct {
 	Parent   *Node
 }
 
+// type traverseFn func(*Node)
+
 type Tree struct {
 	Root        *Node
 	CurrNodePtr *Node
@@ -81,5 +83,22 @@ func (tree *Tree) printTree(root *Node, level int) {
 func (tree *Tree) PrintTree() {
 	if tree.Root != nil {
 		tree.printTree(tree.Root, 0)
+	}
+}
+
+// depth first
+
+func (tree *Tree) TraverseDF_from(root *Node, fn func(*Node)) {
+	for i := 0; i < len(root.Children); i++ {
+		if root.Children[i] != nil {
+			tree.TraverseDF_from(root.Children[i], fn)
+			fn(root.Children[i])
+		}
+	}
+}
+
+func (tree *Tree) TraverseDF(fn func(*Node)) {
+	if tree.Root != nil {
+		tree.TraverseDF_from(tree.Root, fn)
 	}
 }
