@@ -14,8 +14,6 @@ type Node struct {
 	Parent   *Node
 }
 
-// type traverseFn func(*Node)
-
 type Tree struct {
 	Root        *Node
 	CurrNodePtr *Node
@@ -68,37 +66,69 @@ func (tree *Tree) NewTreeFromFile(file_name string) {
 	file.Close()
 }
 
-func (tree *Tree) printTree(root *Node, level int) {
+// iterate children left to right and right to left
+
+func (node *Node) IterateChildren(fn func(*Node), r2l bool) { // right to left
+	if r2l {
+		for i := len(node.Children) - 1; i >= 0; i-- {
+			if node.Children[i] != nil {
+				fn(node.Children[i])
+			}
+		}
+	} else {
+		for i := 0; i < len(node.Children); i++ {
+			if node.Children[i] != nil {
+				fn(node.Children[i])
+			}
+		}
+	}
+}
+
+// depth first pre-order
+
+func (node *Node) TraversePre(fn func(*Node), r2l bool) {
+	fn(node)
+	node.IterateChildren(func(n *Node) { n.TraversePre(fn, r2l) }, r2l)
+}
+
+func (tree *Tree) TraversePre(fn func(*Node), r2l bool) {
+	if tree.Root != nil {
+		tree.Root.TraversePre(fn, r2l)
+	}
+}
+
+// depth first post-order
+
+func (node *Node) TraversePost(fn func(*Node), r2l bool) {
+	node.IterateChildren(func(n *Node) { n.TraversePost(fn, r2l) }, r2l)
+	fn(node)
+}
+
+func (tree *Tree) TraversePost(fn func(*Node), r2l bool) {
+	if tree.Root != nil {
+		tree.Root.TraversePost(fn, r2l)
+	}
+}
+
+// breadth first <-- TODO
+
+// dump to dot <-- TODO maybe
+
+func (node *Node) PrintTree(level int) {
 	for i := 0; i < level; i++ {
 		fmt.Print("-")
 	}
-	fmt.Println(root.Data)
-	for i := 0; i < len(root.Children); i++ {
-		if root.Children[i] != nil {
-			tree.printTree(root.Children[i], level+1)
+	fmt.Println(node.Data)
+
+	for i := 0; i < len(node.Children); i++ {
+		if node.Children[i] != nil {
+			node.Children[i].PrintTree(level + 1)
 		}
 	}
 }
 
 func (tree *Tree) PrintTree() {
 	if tree.Root != nil {
-		tree.printTree(tree.Root, 0)
-	}
-}
-
-// depth first
-
-func (tree *Tree) TraverseDF_from(root *Node, fn func(*Node)) {
-	for i := 0; i < len(root.Children); i++ {
-		if root.Children[i] != nil {
-			tree.TraverseDF_from(root.Children[i], fn)
-			fn(root.Children[i])
-		}
-	}
-}
-
-func (tree *Tree) TraverseDF(fn func(*Node)) {
-	if tree.Root != nil {
-		tree.TraverseDF_from(tree.Root, fn)
+		tree.Root.PrintTree(0)
 	}
 }
