@@ -1,24 +1,23 @@
-package lab1
+package container
 
 import (
-	"os"
 	"bufio"
 	"fmt"
+	"os"
 	"strings"
 )
 
 type Node struct {
 	//Key interface{}
-	Data interface{}
+	Data     interface{}
 	Children []*Node
-	Parent *Node
+	Parent   *Node
 }
 
 type Tree struct {
-	Root *Node
+	Root        *Node
 	CurrNodePtr *Node
 }
-
 
 func (tree *Tree) NewTreeFromFile(file_name string) {
 	fmt.Println("NewTreeFromFile function started")
@@ -64,7 +63,6 @@ func (tree *Tree) NewTreeFromFile(file_name string) {
 		}
 	}
 
-
 	file.Close()
 }
 
@@ -75,7 +73,7 @@ func (tree *Tree) printTree(root *Node, level int) {
 	fmt.Println(root.Data)
 	for i := 0; i < len(root.Children); i++ {
 		if root.Children[i] != nil {
-			tree.printTree(root.Children[i], level + 1)
+			tree.printTree(root.Children[i], level+1)
 		}
 	}
 }
