@@ -1,9 +1,9 @@
 package main
 
-import "lab1/container"
+import "lab1/treecontainer"
 
 func main() {
-	// container.TestNewTreeFromFilePrinting("tree_input_tests/test_input_1.txt")
-	container.TestTraversalsPrinting("tree_input_tests/test_input_3.txt")
-	// container.TestSearchingPrinting("tree_input_tests/test_input_3.txt")
+	// treecontainer.TestNewTreeFromFilePrinting("tree_input_tests/test_input_1.txt")
+	treecontainer.TestTraversalsPrinting("tree_input_tests/test_input_3.txt")
+	// treecontainer.TestSearchingPrinting("tree_input_tests/test_input_3.txt")
 }
