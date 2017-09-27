@@ -84,7 +84,26 @@ func (node *Node) IterateChildren(fn func(*Node), r2l bool) { // right to left
 	}
 }
 
-// depth first pre-order
+func (node *Node) SearchChildren(test func(*Node) *Node, r2l bool) *Node {
+	if r2l {
+		for i := len(node.Children) - 1; i >= 0; i-- {
+			res := test(node.Children[i])
+			if res != nil {
+				return res
+			}
+		}
+	} else {
+		for i := 0; i < len(node.Children); i++ {
+			res := test(node.Children[i])
+			if res != nil {
+				return res
+			}
+		}
+	}
+	return nil
+}
+
+// depth first pre-order traversal
 
 func (node *Node) TraversePre(fn func(*Node), r2l bool) {
 	fn(node)
@@ -97,7 +116,23 @@ func (tree *Tree) TraversePre(fn func(*Node), r2l bool) {
 	}
 }
 
-// depth first post-order
+// depth first pre-order search
+
+func (node *Node) SearchPre(test func(*Node) *Node, r2l bool) *Node {
+	if test(node) != nil {
+		return node
+	}
+	return node.SearchChildren(func(n *Node) *Node { return n.SearchPre(test, r2l) }, r2l)
+}
+
+func (tree *Tree) SearchPre(test func(*Node) *Node, r2l bool) *Node {
+	if tree.Root != nil {
+		return tree.Root.SearchPre(test, r2l)
+	}
+	return nil
+}
+
+// depth first post-order traversal
 
 func (node *Node) TraversePost(fn func(*Node), r2l bool) {
 	node.IterateChildren(func(n *Node) { n.TraversePost(fn, r2l) }, r2l)
@@ -108,6 +143,25 @@ func (tree *Tree) TraversePost(fn func(*Node), r2l bool) {
 	if tree.Root != nil {
 		tree.Root.TraversePost(fn, r2l)
 	}
+}
+
+// depth first post-order search
+
+func (node *Node) SearchPost(test func(*Node) *Node, r2l bool) *Node {
+	res := node.SearchChildren(func(n *Node) *Node { return n.SearchPost(test, r2l) }, r2l)
+	if res != nil {
+		return res
+	} else if test(node) != nil {
+		return node
+	}
+	return nil
+}
+
+func (tree *Tree) SearchPost(test func(*Node) *Node, r2l bool) *Node {
+	if tree.Root != nil {
+		return tree.Root.SearchPost(test, r2l)
+	}
+	return nil
 }
 
 // breadth first
