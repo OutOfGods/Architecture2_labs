@@ -1,8 +1,9 @@
-package container
+package treecontainer
 
 import (
 	"bufio"
 	"fmt"
+	"lab1/queue"
 	"os"
 	"strings"
 )
@@ -164,16 +165,56 @@ func (tree *Tree) SearchPost(test func(*Node) *Node, r2l bool) *Node {
 	return nil
 }
 
-// breadth first
+// breadth first traversal
 
 func (node *Node) TraverseBF(fn func(*Node), r2l bool) {
-	var queue []*Node
-	queue = append(queue, node)
+	q := queue.NewQueue(5)
+	q.Push(node)
 
-	// TODO
+	for !q.IsEmpty() {
+		curr := q.Pop().(*Node)
+
+		fn(curr)
+
+		curr.IterateChildren(func(n *Node) { q.Push(n) }, r2l)
+	}
+}
+
+func (tree *Tree) TraverseBF(fn func(*Node), r2l bool) {
+	if tree.Root != nil {
+		tree.Root.TraverseBF(fn, r2l)
+	}
+}
+
+// breadth first search
+
+func (node *Node) SearchBF(test func(*Node) *Node, r2l bool) *Node {
+	q := queue.NewQueue(5)
+	q.Push(node)
+
+	for !q.IsEmpty() {
+		curr := q.Pop().(*Node)
+
+		res := test(curr)
+		if res != nil {
+			return res
+		}
+
+		curr.IterateChildren(func(n *Node) { q.Push(n) }, r2l)
+	}
+	return nil
+}
+
+func (tree *Tree) SearchBF(fn func(*Node) *Node, r2l bool) *Node {
+	if tree.Root != nil {
+		return tree.Root.SearchBF(fn, r2l)
+	}
+	return nil
 }
 
 // dump to dot <-- TODO maybe
+
+// print tree
 
 func (node *Node) PrintTree(level int) {
 	for i := 0; i < level; i++ {

@@ -1,4 +1,4 @@
-package container
+package treecontainer
 
 import "fmt"
 
@@ -18,21 +18,29 @@ func TestTraversalsPrinting(file_name string) {
 
 	t.PrintTree()
 
-	fmt.Println("------------------ pre l2r ------------------")
+	fmt.Println("------------------ traverse pre l2r ------------------")
 
 	t.TraversePre(func(n *Node) { fmt.Println(n.Data) }, false)
 
-	fmt.Println("------------------ pre r2l ------------------")
+	fmt.Println("------------------ traverse pre r2l ------------------")
 
 	t.TraversePre(func(n *Node) { fmt.Println(n.Data) }, true)
 
-	fmt.Println("------------------ post l2r ------------------")
+	fmt.Println("------------------ traverse post l2r ------------------")
 
 	t.TraversePost(func(n *Node) { fmt.Println(n.Data) }, false)
 
-	fmt.Println("------------------ post r2l ------------------")
+	fmt.Println("------------------ traverse post r2l ------------------")
 
 	t.TraversePost(func(n *Node) { fmt.Println(n.Data) }, true)
+
+	fmt.Println("------------------ traverse BF r2l ------------------")
+
+	t.TraverseBF(func(n *Node) { fmt.Println(n.Data) }, true)
+
+	fmt.Println("------------------ traverse BF l2r ------------------")
+
+	t.TraverseBF(func(n *Node) { fmt.Println(n.Data) }, true)
 }
 
 func TestSearchingPrinting(file_name string) {
@@ -65,6 +73,24 @@ func TestSearchingPrinting(file_name string) {
 	fmt.Println("------------------ search post l2r ------------------")
 
 	n = t.SearchPost(func(n *Node) *Node {
+		fmt.Println(n.Data)
+		if n.Data == "11332" {
+			return n
+		}
+		return nil
+	}, false)
+
+	if n == nil {
+		fmt.Print("NOT FOUND  ")
+		fmt.Println(n)
+	} else {
+		fmt.Print("FOUND  ")
+		fmt.Println(n.Data)
+	}
+
+	fmt.Println("------------------ search BF l2r ------------------")
+
+	n = t.SearchBF(func(n *Node) *Node {
 		fmt.Println(n.Data)
 		if n.Data == "11332" {
 			return n
