@@ -3,7 +3,7 @@ package treecontainer
 import (
 	"bufio"
 	"fmt"
-	"lab1/queue"
+	"../queue"
 	"os"
 	"strings"
 )
@@ -21,8 +21,6 @@ type Tree struct {
 }
 
 func (tree *Tree) NewTreeFromFile(file_name string) {
-	fmt.Println("NewTreeFromFile function started")
-	fmt.Printf("Filename: %s", file_name)
 	file, err := os.Open(file_name)
 	if err != nil {
 		fmt.Println("Error: file not found!")
@@ -41,11 +39,9 @@ func (tree *Tree) NewTreeFromFile(file_name string) {
 		curr_level, data := len(node_text[0]), node_text[1]
 
 		if tree.Root == nil {
-			//fmt.Println("Root initialization")
 			tree.Root = &Node{Data: data, Parent: nil}
 			tree.CurrNodePtr = tree.Root
 		} else {
-			//tree.PrintTree()
 			if curr_level >= prev_level {
 				if curr_level == prev_level {
 					tree.CurrNodePtr = tree.CurrNodePtr.Parent
@@ -60,7 +56,6 @@ func (tree *Tree) NewTreeFromFile(file_name string) {
 				tree.CurrNodePtr = tree.CurrNodePtr.Children[len(tree.CurrNodePtr.Children)-1]
 			}
 			prev_level = curr_level
-			//fmt.Println("*********************************************")
 		}
 	}
 
