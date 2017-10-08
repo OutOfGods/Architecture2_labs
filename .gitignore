@@ -1,7 +1,7 @@
 # executable
 lab1
 
-generated_test_*.txt
+generated_test*.txt
 
 # Created by https://www.gitignore.io/api/emacs,joe,go,linux
 

@@ -9,7 +9,7 @@ try:
 except (IndexError):
     index = ""
 
-f = open("generated_test_" + index + ".txt", "w")
+f = open("generated_test" + index + ".txt", "w")
 
 def rand_nums():
     list = []
