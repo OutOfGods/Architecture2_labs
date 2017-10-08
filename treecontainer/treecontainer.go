@@ -1,11 +1,12 @@
 package treecontainer
 
 import (
+	"../queue"
 	"bufio"
 	"fmt"
-	"../queue"
 	"os"
 	"strings"
+	"sync"
 )
 
 type Node struct {
@@ -106,10 +107,19 @@ func (node *Node) TraversePre(fn func(*Node), r2l bool) {
 	node.IterateChildren(func(n *Node) { n.TraversePre(fn, r2l) }, r2l)
 }
 
-func (tree *Tree) TraversePre(fn func(*Node), r2l bool) {
-	if tree.Root != nil {
-		tree.Root.TraversePre(fn, r2l)
+func (node *Node) TraversePreAsync(fn func(*Node), r2l bool, wg *sync.WaitGroup) {
+	fn(node)
+
+	var children []*Node
+
+	node.IterateChildren(func(n *Node) { children = append(children, n) }, r2l)
+
+	for i := 0; i < len(children); i++ {
+		wg.Add(1)
+		fmt.Println(i)
+		go func(n *Node) { defer wg.Done(); n.TraversePre(fn, r2l) }(children[i])
 	}
+
 }
 
 // depth first pre-order search
@@ -121,24 +131,11 @@ func (node *Node) SearchPre(test func(*Node) *Node, r2l bool) *Node {
 	return node.SearchChildren(func(n *Node) *Node { return n.SearchPre(test, r2l) }, r2l)
 }
 
-func (tree *Tree) SearchPre(test func(*Node) *Node, r2l bool) *Node {
-	if tree.Root != nil {
-		return tree.Root.SearchPre(test, r2l)
-	}
-	return nil
-}
-
 // depth first post-order traversal
 
 func (node *Node) TraversePost(fn func(*Node), r2l bool) {
 	node.IterateChildren(func(n *Node) { n.TraversePost(fn, r2l) }, r2l)
 	fn(node)
-}
-
-func (tree *Tree) TraversePost(fn func(*Node), r2l bool) {
-	if tree.Root != nil {
-		tree.Root.TraversePost(fn, r2l)
-	}
 }
 
 // depth first post-order search
@@ -149,13 +146,6 @@ func (node *Node) SearchPost(test func(*Node) *Node, r2l bool) *Node {
 		return res
 	} else if test(node) != nil {
 		return node
-	}
-	return nil
-}
-
-func (tree *Tree) SearchPost(test func(*Node) *Node, r2l bool) *Node {
-	if tree.Root != nil {
-		return tree.Root.SearchPost(test, r2l)
 	}
 	return nil
 }
@@ -172,12 +162,6 @@ func (node *Node) TraverseBF(fn func(*Node), r2l bool) {
 		fn(curr)
 
 		curr.IterateChildren(func(n *Node) { q.Push(n) }, r2l)
-	}
-}
-
-func (tree *Tree) TraverseBF(fn func(*Node), r2l bool) {
-	if tree.Root != nil {
-		tree.Root.TraverseBF(fn, r2l)
 	}
 }
 
@@ -200,13 +184,6 @@ func (node *Node) SearchBF(test func(*Node) *Node, r2l bool) *Node {
 	return nil
 }
 
-func (tree *Tree) SearchBF(fn func(*Node) *Node, r2l bool) *Node {
-	if tree.Root != nil {
-		return tree.Root.SearchBF(fn, r2l)
-	}
-	return nil
-}
-
 // dump to dot <-- TODO maybe
 
 // print tree
@@ -222,6 +199,53 @@ func (node *Node) PrintTree(level int) {
 			node.Children[i].PrintTree(level + 1)
 		}
 	}
+}
+
+// tree aliases
+
+func (tree *Tree) TraversePre(fn func(*Node), r2l bool) {
+	if tree.Root != nil {
+		tree.Root.TraversePre(fn, r2l)
+	}
+}
+
+func (tree *Tree) TraversePreAsync(fn func(*Node), r2l bool, wg *sync.WaitGroup) {
+	if tree.Root != nil {
+		tree.Root.TraversePreAsync(fn, r2l, wg)
+	}
+}
+
+func (tree *Tree) SearchPre(test func(*Node) *Node, r2l bool) *Node {
+	if tree.Root != nil {
+		return tree.Root.SearchPre(test, r2l)
+	}
+	return nil
+}
+
+func (tree *Tree) TraversePost(fn func(*Node), r2l bool) {
+	if tree.Root != nil {
+		tree.Root.TraversePost(fn, r2l)
+	}
+}
+
+func (tree *Tree) SearchPost(test func(*Node) *Node, r2l bool) *Node {
+	if tree.Root != nil {
+		return tree.Root.SearchPost(test, r2l)
+	}
+	return nil
+}
+
+func (tree *Tree) TraverseBF(fn func(*Node), r2l bool) {
+	if tree.Root != nil {
+		tree.Root.TraverseBF(fn, r2l)
+	}
+}
+
+func (tree *Tree) SearchBF(fn func(*Node) *Node, r2l bool) *Node {
+	if tree.Root != nil {
+		return tree.Root.SearchBF(fn, r2l)
+	}
+	return nil
 }
 
 func (tree *Tree) PrintTree() {

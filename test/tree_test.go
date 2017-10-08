@@ -1,9 +1,9 @@
 package test
 
 import (
-	"testing"
 	"../treecontainer"
 	"fmt"
+	"testing"
 )
 
 func SearchForTest(n *treecontainer.Node) *treecontainer.Node {
@@ -152,7 +152,6 @@ func ExampleTraversePostl2r() {
 	//Andrey
 }
 
-
 func ExampleTraversePostr2l() {
 	var treePtr *treecontainer.Tree = &treecontainer.Tree{}
 	treePtr.NewTreeFromFile("./test_input_2.txt")
@@ -188,7 +187,6 @@ func ExampleTraversePostr2l() {
 	//Andrey
 }
 
-
 func ExampleTraverseBFl2r() {
 	var treePtr *treecontainer.Tree = &treecontainer.Tree{}
 	treePtr.NewTreeFromFile("./test_input_3.txt")
@@ -217,7 +215,6 @@ func ExampleTraverseBFl2r() {
 	//11343
 }
 
-
 func ExampleTraverseBFr2l() {
 	var treePtr *treecontainer.Tree = &treecontainer.Tree{}
 	treePtr.NewTreeFromFile("./test_input_3.txt")
@@ -245,7 +242,6 @@ func ExampleTraverseBFr2l() {
 	//11332
 	//11331
 }
-
 
 func ExampleNewTree() {
 	var t *treecontainer.Tree = &treecontainer.Tree{}
