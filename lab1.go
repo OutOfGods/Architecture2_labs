@@ -23,12 +23,14 @@ func dosearch() {
 		false)
 }
 
-func main() {
+func t_async() {
 	var treePtr *treecontainer.Tree = &treecontainer.Tree{}
 	treePtr.NewTreeFromFile("./test/generated_test.txt")
 
-	ch := make(chan int, 1000)
+	ch := make(chan int, 48828125)
+
 	var wg sync.WaitGroup
+
 	treePtr.TraversePreAsync(func(n *treecontainer.Node) {
 		// fmt.Println(n.Data)
 		if len(ch) != cap(ch) {
@@ -42,13 +44,29 @@ func main() {
 
 	wg.Wait()
 
+	c := 0
 	for len(ch) != 0 {
-		fmt.Println(<-ch)
+		<-ch
+		c++
 	}
+	fmt.Println(c)
+}
 
-	// fmt.Println(len(ch))
+func t_sync() {
+	var treePtr *treecontainer.Tree = &treecontainer.Tree{}
+	treePtr.NewTreeFromFile("./test/generated_test.txt")
 
-	// for len(ch) > 0 {
-	// 	fmt.Println(<-ch)
-	// }
+	var lst []int
+
+	treePtr.TraversePre(func(n *treecontainer.Node) {
+		i, _ := strconv.Atoi(n.Data.(string))
+		lst = append(lst, i/1000)
+	}, false)
+
+	fmt.Println(len(lst))
+}
+
+func main() {
+	t_sync()
+	// t_async()
 }

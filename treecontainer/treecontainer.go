@@ -116,7 +116,6 @@ func (node *Node) TraversePreAsync(fn func(*Node), r2l bool, wg *sync.WaitGroup)
 
 	for i := 0; i < len(children); i++ {
 		wg.Add(1)
-		fmt.Println(i)
 		go func(n *Node) { defer wg.Done(); n.TraversePre(fn, r2l) }(children[i])
 	}
 
