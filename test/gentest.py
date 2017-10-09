@@ -4,8 +4,8 @@ from random import randint
 import sys
 
 # settings
-levels = 11
-maxchildren = 5
+levels = 12
+maxchildren = 6
 maxnum = 100000
 
 try:

@@ -49,7 +49,7 @@ func t_async() {
 		<-ch
 		c++
 	}
-	fmt.Println(c)
+	// fmt.Println(c)
 }
 
 func t_sync() {
@@ -63,10 +63,10 @@ func t_sync() {
 		lst = append(lst, i/1000)
 	}, false)
 
-	fmt.Println(len(lst))
+	// fmt.Println(len(lst))
 }
 
 func main() {
-	t_sync()
-	// t_async()
+	// t_sync()
+	t_async()
 }
