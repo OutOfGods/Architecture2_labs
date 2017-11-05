@@ -1,9 +1,9 @@
 package test
 
 import (
-	"testing"
 	"../treecontainer"
 	"fmt"
+	"testing"
 )
 
 func SearchForTest(n *treecontainer.Node) *treecontainer.Node {
@@ -13,6 +13,11 @@ func SearchForTest(n *treecontainer.Node) *treecontainer.Node {
 	return nil
 }
 
+func TraverseForTest(n *treecontainer.Node) {
+	if n.Data == "11332" {
+	}
+}
+
 func BenchmarkNewTree(b *testing.B) {
 	for n := 0; n < b.N; n++ {
 		var treePtr *treecontainer.Tree = &treecontainer.Tree{}
@@ -20,16 +25,43 @@ func BenchmarkNewTree(b *testing.B) {
 	}
 }
 
+func BenchmarkTraversePrel2r(b *testing.B) {
+	var treePtr *treecontainer.Tree = &treecontainer.Tree{}
+	treePtr.NewTreeFromFile("./generated_test1.txt")
+	b.ResetTimer()
+	for n := 0; n < b.N; n++ {
+		treePtr.TraversePre(TraverseForTest, false)
+	}
+}
+
+func BenchmarkTraversePrel2rNR(b *testing.B) {
+	var treePtr *treecontainer.Tree = &treecontainer.Tree{}
+	treePtr.NewTreeFromFile("./generated_test1.txt")
+	b.ResetTimer()
+	for n := 0; n < b.N; n++ {
+		treePtr.TraversePreNR(TraverseForTest, false)
+	}
+}
+
 func BenchmarkSearchPrel2r(b *testing.B) {
 	var treePtr *treecontainer.Tree = &treecontainer.Tree{}
-	treePtr.NewTreeFromFile("./test_input_1.txt")
+	treePtr.NewTreeFromFile("./generated_test1.txt")
 	b.ResetTimer()
 	for n := 0; n < b.N; n++ {
 		treePtr.SearchPre(SearchForTest, false)
 	}
 }
 
-func BenchmarkSearchPostl2r(b *testing.B) {
+func BenchmarkSearchPrel2rNR(b *testing.B) {
+	var treePtr *treecontainer.Tree = &treecontainer.Tree{}
+	treePtr.NewTreeFromFile("./generated_test1.txt")
+	b.ResetTimer()
+	for n := 0; n < b.N; n++ {
+		treePtr.SearchPreNR(SearchForTest, false)
+	}
+}
+
+func BenchmarkSearchPostl2rNR(b *testing.B) {
 	var treePtr *treecontainer.Tree = &treecontainer.Tree{}
 	treePtr.NewTreeFromFile("./test_input_1.txt")
 	b.ResetTimer()
@@ -38,7 +70,7 @@ func BenchmarkSearchPostl2r(b *testing.B) {
 	}
 }
 
-func BenchmarkSearchBFl2r(b *testing.B) {
+func BenchmarkSearchPostl2r(b *testing.B) {
 	var treePtr *treecontainer.Tree = &treecontainer.Tree{}
 	treePtr.NewTreeFromFile("./test_input_1.txt")
 	b.ResetTimer()
@@ -152,7 +184,6 @@ func ExampleTraversePostl2r() {
 	//Andrey
 }
 
-
 func ExampleTraversePostr2l() {
 	var treePtr *treecontainer.Tree = &treecontainer.Tree{}
 	treePtr.NewTreeFromFile("./test_input_2.txt")
@@ -188,7 +219,6 @@ func ExampleTraversePostr2l() {
 	//Andrey
 }
 
-
 func ExampleTraverseBFl2r() {
 	var treePtr *treecontainer.Tree = &treecontainer.Tree{}
 	treePtr.NewTreeFromFile("./test_input_3.txt")
@@ -217,7 +247,6 @@ func ExampleTraverseBFl2r() {
 	//11343
 }
 
-
 func ExampleTraverseBFr2l() {
 	var treePtr *treecontainer.Tree = &treecontainer.Tree{}
 	treePtr.NewTreeFromFile("./test_input_3.txt")
@@ -245,7 +274,6 @@ func ExampleTraverseBFr2l() {
 	//11332
 	//11331
 }
-
 
 func ExampleNewTree() {
 	var t *treecontainer.Tree = &treecontainer.Tree{}

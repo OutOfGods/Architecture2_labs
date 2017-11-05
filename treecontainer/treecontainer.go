@@ -2,9 +2,11 @@ package treecontainer
 
 import (
 	"../queue"
+	"../stack"
 	"bufio"
 	"fmt"
 	"os"
+	"reflect"
 	"strings"
 )
 
@@ -106,6 +108,20 @@ func (node *Node) TraversePre(fn func(*Node), r2l bool) {
 	node.IterateChildren(func(n *Node) { n.TraversePre(fn, r2l) }, r2l)
 }
 
+// non-recursive
+func (node *Node) TraversePreNR(fn func(*Node), r2l bool) {
+	s := new(stack.Stack)
+	s.Push(node)
+
+	for !s.IsEmpty() {
+		curr := s.Pop().(*Node)
+
+		fn(curr)
+
+		curr.IterateChildren(func(n *Node) { s.Push(n) }, !r2l)
+	}
+}
+
 // depth first pre-order search
 
 func (node *Node) SearchPre(test func(*Node) *Node, r2l bool) *Node {
@@ -113,6 +129,23 @@ func (node *Node) SearchPre(test func(*Node) *Node, r2l bool) *Node {
 		return node
 	}
 	return node.SearchChildren(func(n *Node) *Node { return n.SearchPre(test, r2l) }, r2l)
+}
+
+// non-recursive
+func (node *Node) SearchPreNR(test func(*Node) *Node, r2l bool) *Node {
+	s := new(stack.Stack)
+	s.Push(node)
+
+	for !s.IsEmpty() {
+		curr := s.Pop().(*Node)
+
+		if test(curr) != nil {
+			return node
+		}
+
+		curr.IterateChildren(func(n *Node) { s.Push(n) }, !r2l)
+	}
+	return nil
 }
 
 // depth first post-order traversal
@@ -187,21 +220,57 @@ func (node *Node) PrintTree(level int) {
 
 // tree aliases
 
-func (tree *Tree) TraversePre(fn func(*Node), r2l bool) {
-	if tree.Root != nil {
-		tree.Root.TraversePre(fn, r2l)
-	}
-}
-
 func (tree *Tree) PrintTree() {
 	if tree.Root != nil {
 		tree.Root.PrintTree(0)
 	}
 }
 
+// reflection lol (it actually works)
+func (tree *Tree) traverseTreeAlias(mName string, fn func(*Node), r2l bool) {
+	in := make([]reflect.Value, 2)
+	in[0] = reflect.ValueOf(fn)
+	in[1] = reflect.ValueOf(r2l)
+	if tree.Root != nil {
+		reflect.ValueOf(tree.Root).MethodByName(mName).Call(in)
+	}
+}
+
+// reflection lol (it actually works)
+func (tree *Tree) searchTreeAlias(mName string, test func(*Node) *Node, r2l bool) *Node {
+	in := make([]reflect.Value, 2)
+	in[0] = reflect.ValueOf(test)
+	in[1] = reflect.ValueOf(r2l)
+	if tree.Root != nil {
+		return reflect.ValueOf(tree.Root).MethodByName(mName).Call(in)[0].Interface().(*Node)
+	}
+	return nil
+}
+
+func (tree *Tree) TraversePre(fn func(*Node), r2l bool) {
+	// tree.traverseTreeAlias("TraversePre", fn, r2l)
+	if tree.Root != nil {
+		tree.Root.TraversePre(fn, r2l)
+	}
+}
+
+func (tree *Tree) TraversePreNR(fn func(*Node), r2l bool) {
+	if tree.Root != nil {
+		tree.Root.TraversePreNR(fn, r2l)
+	}
+}
+
 func (tree *Tree) SearchPre(test func(*Node) *Node, r2l bool) *Node {
+	// return tree.searchTreeAlias("SearchPre", test, r2l)
 	if tree.Root != nil {
 		return tree.Root.SearchPre(test, r2l)
+	}
+	return nil
+}
+
+func (tree *Tree) SearchPreNR(test func(*Node) *Node, r2l bool) *Node {
+	if tree.Root != nil {
+		return tree.Root.SearchPreNR(test, r2l)
 	}
 	return nil
 }

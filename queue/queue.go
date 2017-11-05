@@ -1,5 +1,6 @@
 package queue
 
+// slightly changed
 // https://gist.github.com/moraes/2141121
 
 // Queue is a basic FIFO queue based on a circular list that resizes as needed.
