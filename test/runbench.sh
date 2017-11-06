@@ -2,4 +2,7 @@
 
 [ $# -eq 0 ] && regex='.' || regex=$1
 
-go test . -bench=$regex -benchtime 1s -benchmem
+# GOGC=OFF
+go test . -cpuprofile cpu.prof -memprofile mem.prof -bench=$regex -benchtime 1s -benchmem
+
+# go tool pprof test.test cpu.prof

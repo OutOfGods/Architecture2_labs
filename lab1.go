@@ -1,5 +1,7 @@
 package main
 
+import "github.com/davecheney/profile"
+
 import (
 	"./treecontainer"
 	"fmt"
@@ -11,12 +13,12 @@ func main() {
 	// treePtr.PrintTree()
 	treePtr.TraversePre(func(n *treecontainer.Node) { fmt.Println(n.Data) }, false)
 	treePtr.TraverseBF(func(n *treecontainer.Node) { fmt.Println(n.Data) }, false)
-	// treePtr.SearchPre(
-	// 	func(node *treecontainer.Node) *treecontainer.Node {
-	// 		if node.Data == "13323" {
-	// 			return node
-	// 		}
-	// 		return nil
-	// 	},
-	// 	false)
+	treePtr.SearchPre(
+		func(node *treecontainer.Node) *treecontainer.Node {
+			if node.Data == "13323" {
+				return node
+			}
+			return nil
+		},
+		false)
 }
