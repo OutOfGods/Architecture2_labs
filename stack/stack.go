@@ -1,55 +1,89 @@
+// CookieJar - A contestant's algorithm toolbox
+// Copyright (c) 2013 Peter Szilagyi. All rights reserved.
+//
+// CookieJar is dual licensed: use of this source code is governed by a BSD
+// license that can be found in the LICENSE file. Alternatively, the CookieJar
+// toolbox may be used in accordance with the terms and conditions contained
+// in a signed written agreement between you and the author(s).
+
+// Package stack implements a LIFO (last in first out) data structure supporting
+// arbitrary types (even a mixture).
+//
+// Internally it uses a dynamically growing slice of blocks, resulting in faster
+// resizes than a simple dynamic array/slice would allow.
 package stack
 
-// slightly changed
-// https://gist.github.com/bemasher/1777766
+// The size of a block of data
+const blockSize = 4096
 
-type Element struct {
-	value interface{} // All types satisfy the empty interface, so we can store anything here.
-	next  *Element
-}
-
+// Last in, first out data structure.
 type Stack struct {
-	top  *Element
-	size int
+	size     int
+	capacity int
+	offset   int
+
+	blocks [][]interface{}
+	active []interface{}
 }
 
-// Return the stack's length
-func (s *Stack) Len() int {
-	return s.size
+// Creates a new, empty stack.
+func New() *Stack {
+	result := new(Stack)
+	result.active = make([]interface{}, blockSize)
+	result.blocks = [][]interface{}{result.active}
+	result.capacity = blockSize
+	return result
 }
 
-// Push a new element onto the stack
-func (s *Stack) Push(value interface{}) {
-	s.top = &Element{value, s.top}
+// Pushes a value onto the stack, expanding it if necessary.
+func (s *Stack) Push(data interface{}) {
+	if s.size == s.capacity {
+		s.active = make([]interface{}, blockSize)
+		s.blocks = append(s.blocks, s.active)
+		s.capacity += blockSize
+		s.offset = 0
+	} else if s.offset == blockSize {
+		s.active = s.blocks[s.size/blockSize]
+		s.offset = 0
+	}
+	s.active[s.offset] = data
+	s.offset++
 	s.size++
 }
 
-// Remove the top element from the stack and return it's value
-// If the stack is empty, return nil
-func (s *Stack) Pop() (value interface{}) {
-	if s.size > 0 {
-		value, s.top = s.top.value, s.top.next
-		s.size--
-		return
+// Pops a value off the stack and returns it. Currently no shrinking is done.
+func (s *Stack) Pop() (res interface{}) {
+	s.size--
+	s.offset--
+	if s.offset < 0 {
+		s.offset = blockSize - 1
+		s.active = s.blocks[s.size/blockSize]
 	}
-	return nil
+	res, s.active[s.offset] = s.active[s.offset], nil
+	return
 }
 
+// Returns the value currently on the top of the stack. No bounds are checked.
+func (s *Stack) Top() interface{} {
+	if s.offset > 0 {
+		return s.active[s.offset-1]
+	} else {
+		return s.blocks[(s.size-1)/blockSize][blockSize-1]
+	}
+}
+
+// Checks whether the stack is empty or not.
 func (s *Stack) IsEmpty() bool {
 	return s.size == 0
 }
 
-// func tst() {
-// 	stack := new(Stack)
+// Returns the number of elements in the stack.
+func (s *Stack) Size() int {
+	return s.size
+}
 
-// 	stack.Push("Things")
-// 	stack.Push("and")
-// 	stack.Push("Stuff")
+// Resets the stack, effectively clearing its contents.
+func (s *Stack) Reset() {
+	*s = *New()
+}
 
-// 	for stack.Len() > 0 {
-// 		// We have to do a type assertion because we get back a variable of type
-// 		// interface{} while the underlying type is a string.
-// 		fmt.Printf("%s ", stack.Pop().(string))
-// 	}
-// 	fmt.Println()
-// }

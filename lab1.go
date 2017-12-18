@@ -1,6 +1,6 @@
 package main
 
-import "github.com/davecheney/profile"
+// import "profile"
 
 import (
 	"./treecontainer"

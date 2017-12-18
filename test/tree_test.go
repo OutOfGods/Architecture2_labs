@@ -61,6 +61,15 @@ func BenchmarkSearchPrel2rNR(b *testing.B) {
 	}
 }
 
+func BenchmarkSearchPrel2rNRAsync(b *testing.B) {
+	var treePtr *treecontainer.Tree = &treecontainer.Tree{}
+	treePtr.NewTreeFromFile("./generated_test1.txt")
+	b.ResetTimer()
+	for n := 0; n < b.N; n++ {
+		treePtr.SearchPreNRAsync(SearchForTest, false)
+	}
+}
+
 func BenchmarkSearchPostl2rNR(b *testing.B) {
 	var treePtr *treecontainer.Tree = &treecontainer.Tree{}
 	treePtr.NewTreeFromFile("./test_input_1.txt")

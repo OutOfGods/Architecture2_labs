@@ -8,6 +8,7 @@ import (
 	"os"
 	"reflect"
 	"strings"
+	"sync"
 )
 
 type Node struct {
@@ -79,6 +80,7 @@ func (node *Node) IterateChildren(fn func(*Node), r2l bool) { // right to left
 				fn(node.Children[i])
 			}
 		}
+
 	}
 }
 
@@ -110,7 +112,8 @@ func (node *Node) TraversePre(fn func(*Node), r2l bool) {
 
 // non-recursive
 func (node *Node) TraversePreNR(fn func(*Node), r2l bool) {
-	s := new(stack.Stack)
+// 	s := new(stack.Stack)
+	s := stack.New()
 	s.Push(node)
 
 	for !s.IsEmpty() {
@@ -133,7 +136,8 @@ func (node *Node) SearchPre(test func(*Node) *Node, r2l bool) *Node {
 
 // non-recursive
 func (node *Node) SearchPreNR(test func(*Node) *Node, r2l bool) *Node {
-	s := new(stack.Stack)
+//	s := new(stack.Stack)
+	s := stack.New()
 	s.Push(node)
 
 	for !s.IsEmpty() {
@@ -142,10 +146,39 @@ func (node *Node) SearchPreNR(test func(*Node) *Node, r2l bool) *Node {
 		if test(curr) != nil {
 			return node
 		}
-
+	
 		curr.IterateChildren(func(n *Node) { s.Push(n) }, !r2l)
 	}
 	return nil
+}
+
+func (node *Node) SearchPreNRAsync(test func(*Node) *Node, r2l bool) *Node {
+	if test(node) != nil {
+		return node
+	}
+
+	var wg sync.WaitGroup
+
+	var children []*Node
+
+	node.IterateChildren(func(n *Node) { children = append(children, n) }, r2l)
+	
+	var resNode *Node
+	var res *Node
+	resNode = nil
+	for i := 0; i < len(children); i++ {
+		wg.Add(1)
+		go func(n *Node) { 
+			defer wg.Done(); 
+			res = n.SearchPreNR(test, r2l) }(children[i])			
+			if res != nil {
+				resNode = res
+			}
+	}
+
+	wg.Wait()
+
+	return resNode
 }
 
 // depth first post-order traversal
@@ -271,6 +304,13 @@ func (tree *Tree) SearchPre(test func(*Node) *Node, r2l bool) *Node {
 func (tree *Tree) SearchPreNR(test func(*Node) *Node, r2l bool) *Node {
 	if tree.Root != nil {
 		return tree.Root.SearchPreNR(test, r2l)
+	}
+	return nil
+}
+
+func (tree *Tree) SearchPreNRAsync(test func(*Node) *Node, r2l bool) *Node {
+	if tree.Root != nil {
+		return tree.Root.SearchPreNRAsync(test, r2l)
 	}
 	return nil
 }
