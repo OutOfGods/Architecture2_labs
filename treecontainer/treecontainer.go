@@ -207,13 +207,13 @@ func (node *Node) SearchPreNRAsync(test func(*Node) *Node, r2l bool) *Node {
 			// defer wg.Done();
 			defer func () { doneN++ }()
 			res := n.SearchPreNRAsyncAux(test, r2l, &done)
+			if ! done {
+				result <- res
+			}
 			if res != nil {
 				// fmt.Println("write to result")
 				done = true
-				result <- res
 				close(result)
-			} else {
-				result <- nil
 			}
 		}(children[i])
 	}
