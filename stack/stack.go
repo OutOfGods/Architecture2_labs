@@ -14,7 +14,7 @@
 package stack
 
 // The size of a block of data
-const blockSize = 4096
+const blockSize = 64
 
 // Last in, first out data structure.
 type Stack struct {

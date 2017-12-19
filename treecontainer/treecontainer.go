@@ -8,7 +8,7 @@ import (
 	"os"
 	"reflect"
 	"strings"
-	"sync"
+//	"sync"
 )
 
 type Node struct {
@@ -144,7 +144,28 @@ func (node *Node) SearchPreNR(test func(*Node) *Node, r2l bool) *Node {
 		curr := s.Pop().(*Node)
 
 		if test(curr) != nil {
-			return node
+			return curr
+		}
+	
+		curr.IterateChildren(func(n *Node) { s.Push(n) }, !r2l)
+	}
+	return nil
+}
+
+func (node *Node) SearchPreNRAsyncAux(test func(*Node) *Node, r2l bool, done *bool) *Node {
+	s := stack.New()
+	s.Push(node)
+
+	for !s.IsEmpty() {
+		curr := s.Pop().(*Node)
+
+		if test(curr) != nil {
+			// *done = true
+			return curr
+		}
+		
+		if *done == true {
+			return nil
 		}
 	
 		curr.IterateChildren(func(n *Node) { s.Push(n) }, !r2l)
@@ -157,28 +178,57 @@ func (node *Node) SearchPreNRAsync(test func(*Node) *Node, r2l bool) *Node {
 		return node
 	}
 
-	var wg sync.WaitGroup
+	// var wg sync.WaitGroup
 
 	var children []*Node
 
 	node.IterateChildren(func(n *Node) { children = append(children, n) }, r2l)
+
+	// done := make(chan bool)
+
+	// var doneChans []chan bool
+
+	// for i := 0; i < len(children); i++ {
+	// 	doneChans[i] = make(chan bool)
+	// }
+
+	result := make(chan *Node)
+	done := false
+	doneN := 0
 	
-	var resNode *Node
-	var res *Node
-	resNode = nil
 	for i := 0; i < len(children); i++ {
-		wg.Add(1)
-		go func(n *Node) { 
-			defer wg.Done(); 
-			res = n.SearchPreNR(test, r2l) }(children[i])			
+		// wg.Add(1)
+		go func(n *Node) {
+			// defer func() {
+			// 	if r := recover(); r != nil {
+			// 		return
+			// 	}
+			// }()
+			// defer wg.Done();
+			defer func () { doneN++ }()
+			res := n.SearchPreNRAsyncAux(test, r2l, &done)
 			if res != nil {
-				resNode = res
+				// fmt.Println("write to result")
+				done = true
+				result <- res
+				close(result)
+			} else {
+				result <- nil
 			}
+		}(children[i])
 	}
-
-	wg.Wait()
-
-	return resNode
+	
+	// wg.Wait()
+	for retval := range result {
+		if retval != nil {
+			return retval
+		}
+		if doneN == len(children) {
+			close(result)
+			return nil
+		}
+	}
+	return nil
 }
 
 // depth first post-order traversal

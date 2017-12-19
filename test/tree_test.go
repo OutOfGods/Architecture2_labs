@@ -7,7 +7,10 @@ import (
 )
 
 func SearchForTest(n *treecontainer.Node) *treecontainer.Node {
-	if n.Data == "11332" {
+	// remove minus to test search
+	// otherwise it tests traverse
+	// (i suppose)
+	if n.Data == "-11332" {
 		return n
 	}
 	return nil
@@ -66,8 +69,13 @@ func BenchmarkSearchPrel2rNRAsync(b *testing.B) {
 	treePtr.NewTreeFromFile("./generated_test1.txt")
 	b.ResetTimer()
 	for n := 0; n < b.N; n++ {
+		// result := make(chan *treecontainer.Node, 1)
 		treePtr.SearchPreNRAsync(SearchForTest, false)
+		// <- result
 	}
+	// for res := range result {
+	// 	fmt.res
+	// }
 }
 
 func BenchmarkSearchPostl2rNR(b *testing.B) {
